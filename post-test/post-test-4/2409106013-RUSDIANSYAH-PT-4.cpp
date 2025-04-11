@@ -226,7 +226,7 @@ void cekSaldo(const Nasabah data[], int size) {
 }
 
 void isiSaldo(Nasabah data[], int size) {
-    if (size = 0) {
+    if (size == 0) {
         cout << "Belum ada rekening yang terdaftar." << endl;
     } else {
         string nomorRekening;
