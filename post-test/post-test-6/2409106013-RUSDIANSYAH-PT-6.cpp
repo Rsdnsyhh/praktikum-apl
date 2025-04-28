@@ -3,7 +3,7 @@
 #include <algorithm>
 using namespace std;
 
-#define MAX_NASABAH 2
+#define MAX_NASABAH 4
 
 struct Nasabah {
     string nama;
@@ -15,10 +15,14 @@ Nasabah dataNasabah[MAX_NASABAH];
 int panjang = 0;
 int Kesalahan = 0;
 
-//Deklarasi fungsi dengan parameter
+// Deklarasi fungsi sorting
+void bubbleSortNama(Nasabah arr[], int n); // Sorting nama ascending (Bubble Sort)
+void selectionSortSaldo(Nasabah arr[], int n); // Sorting saldo descending (Selection Sort)
+void insertionSortNomorRekening(Nasabah arr[], int n); // Sorting nomor rekening ascending (Insertion Sort)
+
 void buatRekening(Nasabah* data, int* size);
 void hapusRekening(Nasabah* data, int* size);
-void tampilkanRekening(const Nasabah* data, int size);
+void tampilkanRekening(Nasabah* data, int size, int sortMethod = 0);
 void updateRekening(Nasabah* data, int size);
 void cekSaldo(const Nasabah* data, int size);
 void isiSaldo(Nasabah* data, int size);
@@ -101,7 +105,43 @@ int main() {
     return 0;
 }
 
-//Fungsi menggunakan parameter dereference
+// Implementasi Bubble Sort untuk sorting nama (ascending)
+void bubbleSortNama(Nasabah arr[], int n) {
+    for (int i = 0; i < n-1; i++) {
+        for (int j = 0; j < n-i-1; j++) {
+            if (arr[j].nama > arr[j+1].nama) {
+                swap(arr[j], arr[j+1]);
+            }
+        }
+    }
+}
+
+// Implementasi Selection Sort untuk sorting saldo (descending)
+void selectionSortSaldo(Nasabah arr[], int n) {
+    for (int i = 0; i < n-1; i++) {
+        int max_idx = i;
+        for (int j = i+1; j < n; j++) {
+            if (arr[j].saldo > arr[max_idx].saldo) {
+                max_idx = j;
+            }
+        }
+        swap(arr[max_idx], arr[i]);
+    }
+}
+
+// Implementasi Insertion Sort untuk sorting nomor rekening (ascending)
+void insertionSortNomorRekening(Nasabah arr[], int n) {
+    for (int i = 1; i < n; i++) {
+        Nasabah key = arr[i];
+        int j = i - 1;
+        while (j >= 0 && arr[j].nomorRekening > key.nomorRekening) {
+            arr[j + 1] = arr[j];
+            j--;
+        }
+        arr[j + 1] = key;
+    }
+}
+
 void buatRekening(Nasabah* data, int* size) {
     if (*size >= MAX_NASABAH) {
         cout << "Maaf jumlah nasabah sudah penuh. Tidak dapat menambahkan rekening baru." << endl;
@@ -132,7 +172,6 @@ void buatRekening(Nasabah* data, int* size) {
     }
 }
 
-//Fungsi menggunakan parameter dereference
 void hapusRekening(Nasabah* data, int* size) {
     if (*size == 0) {
         cout << "Belum ada rekening yang terdaftar" << endl;     
@@ -160,24 +199,43 @@ void hapusRekening(Nasabah* data, int* size) {
     }
 }
 
-//Fungsi menggunakan parameter pointer
-void tampilkanRekening(const Nasabah* data, int size) {
+void tampilkanRekening(Nasabah* data, int size, int sortMethod) {
     if (size == 0) {
         cout << "Belum ada rekening yang terdaftar." << endl;
     } else {
+        // Membuat salinan data untuk diurutkan
+        Nasabah sortedData[MAX_NASABAH];
+        for (int i = 0; i < size; i++) {
+            sortedData[i] = data[i];
+        }
+
+        // Metode sorting
+        switch (sortMethod) {
+            case 1: // Bubble Sort by Nama (A-Z)
+                bubbleSortNama(sortedData, size);
+                break;
+            case 2: // Selection Sort by Saldo (Descending)
+                selectionSortSaldo(sortedData, size);
+                break;
+            case 3: // Insertion Sort by Nomor Rekening (Ascending)
+                insertionSortNomorRekening(sortedData, size);
+                break;
+            default: // Tidak diurutkan (sortMethod = 0)
+                break;
+        }
+
         cout << "<====================================================================>" << endl;
         cout << "      |                      DAFTAR NASABAH                    |       " << endl;
         cout << "<====================================================================>" << endl;
         for (int i = 0; i < size; i++) {
-            cout << "     | " << i + 1 <<  ". Nama : " << data[i].nama
-                << " | Nomor Rekening : " << data[i].nomorRekening
-                << " | Saldo : Rp." << data[i].saldo << endl;
+            cout << "     | " << i + 1 <<  ". Nama : " << sortedData[i].nama
+                << " | Nomor Rekening : " << sortedData[i].nomorRekening
+                << " | Saldo : Rp." << sortedData[i].saldo << endl;
         }
         cout << "<====================================================================>"<<endl;
     }
 }
 
-//Fungsi menggunakan parameter pointer
 void updateRekening(Nasabah* data, int size) {
     if (size == 0) {
         cout << "Belum ada rekening yang terdaftar." << endl;
@@ -205,7 +263,6 @@ void updateRekening(Nasabah* data, int size) {
     }
 }
 
-//Fungsi menggunakan parameter pointer
 void cekSaldo(const Nasabah* data, int size) {
     if (size == 0) {
         cout << "Belum ada rekening yang terdaftar." << endl;
@@ -231,7 +288,6 @@ void cekSaldo(const Nasabah* data, int size) {
     }
 }
 
-//Fungsi menggunakan parameter pointer
 void isiSaldo(Nasabah* data, int size) {
     if (size == 0) {
         cout << "Belum ada rekening yang terdaftar." << endl;
@@ -259,7 +315,6 @@ void isiSaldo(Nasabah* data, int size) {
     }
 }
 
-//Fungsi menggunakan parameter pointer
 void tarikSaldo(Nasabah* data, int size) {
     if (size == 0) {
         cout << "Belum ada rekening yang terdaftar." << endl;
@@ -291,7 +346,6 @@ void tarikSaldo(Nasabah* data, int size) {
     }
 }
 
-//Fungsi menggunakan parameter address-of dan dereference
 void menuAdmin(Nasabah* data, int* size, int* errors) {
     while (true) {
         cout << "<====================================================================>" << endl;
@@ -315,9 +369,13 @@ void menuAdmin(Nasabah* data, int* size, int* errors) {
             case 2:
                 hapusRekening(data, size);
                 break;
-            case 3:
-                tampilkanRekening(data, *size);
+            case 3: {
+                int sortMethod = 0;
+                cout << "Pilih yang akan disorting (Pilih 0: Tidak sorting, Pilih 1: Nama A-Z, Pilih 2: Saldo, Pilih 3: No.Rek): ";
+                cin >> sortMethod;
+                tampilkanRekening(data, *size, sortMethod);
                 break;
+            }
             case 4:
                 updateRekening(data, *size);
                 break;
@@ -334,7 +392,6 @@ void menuAdmin(Nasabah* data, int* size, int* errors) {
     }
 }
 
-//Fungsi menggunakan parameter address-of dan dereference
 void menuUser(Nasabah* data, int size, int* errors) {
     while (true) {
         cout << "<====================================================================>" << endl;
